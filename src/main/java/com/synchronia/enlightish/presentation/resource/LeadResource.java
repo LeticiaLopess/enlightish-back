@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
-import java.util.UUID;
 import java.net.URI;
 
 @RestController
@@ -25,7 +24,7 @@ public class LeadResource {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Lead> findById(@PathVariable UUID id) {
+    public ResponseEntity<Lead> findById(@PathVariable String id) {
         Lead lead = service.findById(id);
         return ResponseEntity.ok().body(lead);
     }
@@ -38,14 +37,15 @@ public class LeadResource {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Lead> update(@PathVariable UUID id, @RequestBody Lead lead) {
+    public ResponseEntity<Lead> update(@PathVariable String id, @RequestBody Lead lead) {
         lead = service.update(id, lead);
         return ResponseEntity.ok().body(lead);
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }

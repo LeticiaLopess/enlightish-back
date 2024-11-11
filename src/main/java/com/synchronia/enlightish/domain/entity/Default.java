@@ -6,20 +6,17 @@ import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 @MappedSuperclass
 public class Default {
 
     @Id
     @Column(nullable = false, updatable = false)
-    private UUID id;
+    private String id;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
     private Instant creationDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
     private Instant lastUpdatedDate;
-    @Enumerated(EnumType.STRING)
-    private Status status;
 
     @Version
     private Integer version;
@@ -35,11 +32,11 @@ public class Default {
         this.lastUpdatedDate = Instant.now();
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -57,14 +54,6 @@ public class Default {
 
     public void setLastUpdatedDate(Instant lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     public Integer getVersion() {
@@ -87,4 +76,5 @@ public class Default {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

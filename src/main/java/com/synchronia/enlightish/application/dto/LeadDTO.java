@@ -1,10 +1,10 @@
 package com.synchronia.enlightish.application.dto;
+import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
-public class LeadDTO {
+public class LeadDTO implements Serializable {
 
-    private UUID id;
+    private String id;
     private String name;
     private String mail;
     private String phone;
@@ -12,7 +12,7 @@ public class LeadDTO {
 
     public LeadDTO() {}
 
-    public LeadDTO(UUID id, String name, String mail, String phone, Instant birth) {
+    public LeadDTO(String id, String name, String mail, String phone, Instant birth) {
         this.id = id;
         this.name = name;
         this.mail = mail;
@@ -20,11 +20,11 @@ public class LeadDTO {
         this.birth = birth;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

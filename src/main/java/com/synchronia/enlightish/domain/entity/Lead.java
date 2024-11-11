@@ -14,28 +14,35 @@ public class Lead extends Default implements Serializable {
 
     @Id
     @Column(nullable = false, updatable = false)
-    private UUID id;
+    private String id;
     private String name;
     private String mail;
     private String phone;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
-    private Instant birth;
+    private Instant birthDate;
+
+    @OneToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
+
     public Lead() {
-        this.id = UUID.randomUUID();
     }
 
-    public Lead(String name, String mail, String phone, Instant birth) {
+    public Lead(String name, String mail, String phone, Instant birth, Address address) {
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.mail = mail;
         this.phone = phone;
-        this.birth = birth;
+        this.birthDate = birth;
+        this.address = address;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -63,12 +70,20 @@ public class Lead extends Default implements Serializable {
         this.phone = phone;
     }
 
-    public Instant getBirth() {
-        return birth;
+    public Instant getBirthDate() {
+        return birthDate;
     }
 
-    public void setBirth(Instant birth) {
-        this.birth = birth;
+    public void setBirthDate(Instant birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     @Override
@@ -83,4 +98,5 @@ public class Lead extends Default implements Serializable {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

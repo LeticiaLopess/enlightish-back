@@ -2,52 +2,63 @@ package com.synchronia.enlightish.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.synchronia.enlightish.domain.enumeration.Role;
+import com.synchronia.enlightish.domain.enumeration.Status;
 import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tb_user")
 public class User extends Default {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, updatable = false)
-    private UUID id;
+    private String id;
     private String username;
     private String password;
     private String name;
     private String mail;
-    private String phoneNumber;
+    private String phone;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
     private Instant birthDate;
 
+    private Status status;
+
+    @OneToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
+
     @ElementCollection
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role_code", nullable = false)
+    @Column(name = "role_name", nullable = false)
     @Enumerated(EnumType.STRING)
     private List<Role> roles;
 
     public User() {
-        this.id = UUID.randomUUID();
     }
 
-    public User(String username, String password, String name, String mail, String phoneNumber, Instant birthDate) {
+    public User(String username, String password, String name, String mail, String phone, Instant birthDate, Status status, Address address) {
+        this.id = UUID.randomUUID().toString();
         this.username = username;
         this.password = password;
         this.name = name;
         this.mail = mail;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
         this.birthDate = birthDate;
+        this.status = status;
+        this.address = address;
         this.roles = new ArrayList<>();
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -83,12 +94,12 @@ public class User extends Default {
         this.mail = mail;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Instant getBirthDate() {
@@ -101,6 +112,22 @@ public class User extends Default {
 
     public List<Role> getRoles() {
         return roles;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     @Override

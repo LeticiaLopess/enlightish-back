@@ -26,6 +26,6 @@ public enum Status {
                 return status;
             }
         }
-        throw new IllegalArgumentException("Invalid code: " + code);
+        throw new IllegalArgumentException("Código inválido: " + code);
     }
 }

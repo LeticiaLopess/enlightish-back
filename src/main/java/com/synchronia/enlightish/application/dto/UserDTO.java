@@ -2,37 +2,37 @@ package com.synchronia.enlightish.application.dto;
 
 import com.synchronia.enlightish.domain.enumeration.Role;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
-public class UserDTO {
+public class UserDTO implements Serializable {
 
-    private UUID id;
+    private String id;
     private String username;
     private String name;
     private String mail;
-    private String phoneNumber;
+    private String phone;
     private Instant birthDate;
     private List<Role> roles;
 
     public UserDTO() {}
 
-    public UserDTO(UUID id, String username, String name, String mail, String phoneNumber, Instant birthDate, List<Role> roles) {
+    public UserDTO(String id, String username, String name, String mail, String phone, Instant birthDate, List<Role> roles) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.mail = mail;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
         this.birthDate = birthDate;
         this.roles = roles;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -60,12 +60,12 @@ public class UserDTO {
         this.mail = mail;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Instant getBirthDate() {
