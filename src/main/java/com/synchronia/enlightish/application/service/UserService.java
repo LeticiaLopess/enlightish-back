@@ -26,29 +26,48 @@ public class UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     public List<User> findAll() {
-        return repository.findAll();
+        try {
+            return repository.findAll();
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar os usuários: {}", e.getMessage());
+            throw new ApiException("Erro ao buscar os usuários.", 500);
+        }
     }
 
     public User findById(String id) {
-        Optional<User> user = repository.findById(id);
-        return user.orElseThrow(() -> new ResourceNotFoundException(id));
+        try {
+            Optional<User> user = repository.findById(id);
+            return user.orElseThrow(() -> new ResourceNotFoundException(id));
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar usuário com o ID {}: {}", id, e.getMessage());
+            throw new ApiException("Erro ao buscar o usuário.", 500);
+        }
     }
 
     public User insert(User user) {
-        if (repository.existsById(user.getId())) {
-            throw new ApiException(String.format("Um usuário com o ID '%s' já existe.", user.getId()), 409);
-        }
+        try {
+            if (repository.existsById(user.getId())) {
+                throw new ApiException(String.format("Um usuário com o ID '%s' já existe.", user.getId()), 409);
+            }
 
-        return repository.save(user);
+            return repository.save(user);
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao inserir usuário: {}", e.getMessage());
+            throw new ApiException("Erro ao inserir o usuário", 500);
+        }
     }
 
-    public void delete(String id) {
+    public boolean delete(String id) {
         try {
             if (!repository.existsById(id)) {
                 throw new ResourceNotFoundException(id);
             }
 
             repository.deleteById(id);
+            return true;
 
         } catch (EmptyResultDataAccessException e) {
             LOGGER.error("Erro ao deletar usuário com o ID {}: {}", id, e.getMessage());
@@ -56,7 +75,11 @@ public class UserService {
 
         } catch (DataIntegrityViolationException e) {
             LOGGER.error("Violação de integridade do banco de dados ao tentar excluir usuário com ID {}: {}", id, e.getMessage());
-            throw new DatabaseException(e.getMessage());
+            throw new ApiException("Erro ao tentar excluir o usuário devido a uma violação de integridade do banco de dados.", 500);
+
+        } catch (Exception e) {
+            LOGGER.error("Ocorreu um erro inesperado ao tentar deletar o usuário com o ID {}: {}.", id, e.getMessage());
+            return false;
         }
     }
 

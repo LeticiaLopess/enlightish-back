@@ -1,7 +1,6 @@
 package com.synchronia.enlightish.application.service;
 
 import com.synchronia.enlightish.global.exception.ApiException;
-import com.synchronia.enlightish.application.service.exception.DatabaseException;
 import com.synchronia.enlightish.application.service.exception.ResourceNotFoundException;
 import com.synchronia.enlightish.domain.entity.Address;
 import com.synchronia.enlightish.infrastructure.repository.AddressRepository;
@@ -26,37 +25,60 @@ public class AddressService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     public List<Address> findAll() {
-        return repository.findAll();
+        try {
+            return repository.findAll();
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar os endereços: {}", e.getMessage());
+            throw new ApiException("Erro ao buscar os endereços.", 500);
+        }
     }
 
     public Address findById(String id) {
-        Optional<Address> address = repository.findById(id);
-        return address.orElseThrow(() -> new ResourceNotFoundException(id));
+        try {
+            Optional<Address> address = repository.findById(id);
+            return address.orElseThrow(() -> new ResourceNotFoundException(id));
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar endereço com o ID {}: {}", id, e.getMessage());
+            throw new ApiException("Erro ao buscar o endereço.", 500);
+        }
     }
 
     public Address insert(Address address) {
-        if (repository.existsById(address.getId())) {
-            throw new ApiException(String.format("Um endereço com o ID '%s' já existe.", address.getId()), 409);
-        }
+        try {
+            if (repository.existsById(address.getId())) {
+                throw new ApiException("Endereço já existe com o ID " + address.getId(), 409);
+            }
 
-        return repository.save(address);
+            return repository.save(address);
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao inserir endereço: {}", e.getMessage());
+            throw new ApiException("Erro ao inserir o endereço", 500);
+        }
     }
 
-    public void delete(String id) {
+    public boolean delete(String id) {
         try {
-            if(!repository.existsById(id)) {
+            if (!repository.existsById(id)) {
                 throw new ResourceNotFoundException(id);
             }
 
             repository.deleteById(id);
+            return true;
 
         } catch (EmptyResultDataAccessException e) {
-            LOGGER.error("Erro ao deletar endereço com o ID {}: {}", id, e.getMessage());
+            LOGGER.error("Erro ao deletar endereço com o ID {}: {}.", id, e.getMessage());
             throw new ResourceNotFoundException(id);
 
         } catch (DataIntegrityViolationException e) {
-            LOGGER.error("Violação de integridade do banco de dados ao tentar excluir endereço com ID {}: {}", id, e.getMessage());
-            throw new DatabaseException(e.getMessage());
+            LOGGER.error("Violação de integridade do banco de dados ao tentar excluir endereço com ID {}: {}.", id, e.getMessage());
+            throw new ApiException("Erro ao tentar excluir o endereço devido a uma violação de integridade do banco de dados.", 500);
+
+        } catch (Exception e) {
+            LOGGER.error("Ocorreu um erro inesperado ao tentar deletar o endereço com o ID {}: {}.", id, e.getMessage());
+            return false;
         }
     }
 
@@ -64,10 +86,11 @@ public class AddressService {
         try {
             Address entity = repository.getReferenceById(id);
             updateData(entity, address);
+
             return repository.save(entity);
 
         } catch (EntityNotFoundException e) {
-            LOGGER.error("Endereço não encontrado com o ID {}: {}", id, e.getMessage());
+            LOGGER.error("Endereço não encontrado com o ID {}: {}.", id, e.getMessage());
             throw new ResourceNotFoundException(id);
         }
     }

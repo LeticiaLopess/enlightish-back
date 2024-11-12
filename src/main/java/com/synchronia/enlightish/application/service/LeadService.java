@@ -26,29 +26,49 @@ public class LeadService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     public List<Lead> findAll() {
-        return repository.findAll();
+        try {
+            return repository.findAll();
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar os leads: {}", e.getMessage());
+            throw new ApiException("Erro ao buscar os leads.", 500);
+        }
+
     }
 
     public Lead findById(String id) {
-        Optional<Lead> lead = repository.findById(id);
-        return lead.orElseThrow(() -> new ResourceNotFoundException(id));
+        try {
+            Optional<Lead> lead = repository.findById(id);
+            return lead.orElseThrow(() -> new ResourceNotFoundException(id));
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar lead com o ID {}: {}", id, e.getMessage());
+            throw new ApiException("Erro ao buscar o lead.", 500);
+        }
     }
 
     public Lead insert(Lead lead) {
-        if (repository.existsById(lead.getId())) {
-            throw new ApiException(String.format("Um lead com o ID '%s' já existe.", lead.getId()), 409);
-        }
+        try {
+            if (repository.existsById(lead.getId())) {
+                throw new ApiException(String.format("Um lead com o ID '%s' já existe.", lead.getId()), 409);
+            }
 
-        return repository.save(lead);
+            return repository.save(lead);
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao inserir lead: {}", e.getMessage());
+            throw new ApiException("Erro ao inserir o lead", 500);
+        }
     }
 
-    public void delete(String id) {
+    public boolean delete(String id) {
         try {
             if (!repository.existsById(id)) {
                 throw new ResourceNotFoundException(id);
             }
 
             repository.deleteById(id);
+            return true;
 
         } catch (EmptyResultDataAccessException e) {
             LOGGER.error("Erro ao deletar lead com o ID {}: {}", id, e.getMessage());
@@ -56,7 +76,11 @@ public class LeadService {
 
         } catch (DataIntegrityViolationException e) {
             LOGGER.error("Violação de integridade do banco de dados ao tentar excluir lead com ID {}: {}", id, e.getMessage());
-            throw new DatabaseException(e.getMessage());
+            throw new ApiException("Erro ao tentar excluir o lead devido a uma violação de integridade do banco de dados.", 500);
+
+        } catch (Exception e) {
+            LOGGER.error("Ocorreu um erro inesperado ao tentar deletar o endereço com o ID {}: {}.", id, e.getMessage());
+            return false;
         }
     }
 
@@ -85,4 +109,5 @@ public class LeadService {
             setter.accept(value);
         }
     }
+
 }
